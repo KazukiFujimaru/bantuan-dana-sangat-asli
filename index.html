@@ -166,7 +166,7 @@
 <script>
     const form = document.getElementById('registrationForm');
     const consoleBox = document.getElementById('errorConsole');
-    const usedUsernames = ['admin', 'budi', 'user123', 'pemerintah'];
+    const usedUsernames = ['admin', 'budi', 'user123', 'pemerintah', '1', 'test', 'asd', 'a', '123', 'sds', 'sdas', 't'];
     const validAreaIds = [102, 205, 309];
 
     form.addEventListener('submit', function(e) {
@@ -207,15 +207,15 @@
             return;
         }
 
-        // 4. CHECK Income
-        if (data.income > 200000) {
-            showError(`[SQLSTATE 23514] ERROR: violates check constraint "chk_max_income".\nDETAIL: Income Rp ${data.income} exceeds threshold for aid eligibility.`, 'income');
+        // 4. CHECK Income Range (100.000 - 200.000)
+        if (data.income < 100000 || data.income > 200000) {
+            showError(`[SQLSTATE 23514] ERROR: violates check constraint "chk_income_range".\nDETAIL: Income Rp ${data.income} is out of bounds. Must be between 100000 and 200000.`, 'income');
             return;
         }
 
         // 5. CHECK Dependents
         if (data.dependents <= 4) {
-            showError(`[SQLSTATE 23514] ERROR: violates check constraint "chk_min_dependents".\nDETAIL: At least 4 dependent required.`, 'dependents');
+            showError(`[SQLSTATE 23514] ERROR: violates check constraint "chk_min_dependents".\nDETAIL: At least 5 dependent required.`, 'dependents');
             return;
         }
 
@@ -225,7 +225,17 @@
             return;
         }
 
-        // 7. UNIQUE Username
+        // 7. CHECK Username Length, Format & Unique
+        if (data.username.length < 5) {
+            showError(`[SQLSTATE 23514] ERROR: violates check constraint "chk_username_min_length".\nDETAIL: Length of (username)=(${data.username}) is ${data.username.length}. Minimum allowed length is 5 characters.`, 'username');
+            return;
+        }
+
+        if (!/^[a-zA-Z]+$/.test(data.username)) {
+            showError(`[SQLSTATE 23514] ERROR: value violates check constraint "chk_username_format".\nDETAIL: Key (username)=(${data.username}) is invalid. Username must contain only alphabetic characters without spaces or symbols.`, 'username');
+            return;
+        }
+        
         if (usedUsernames.includes(data.username)) {
             showError(`[SQLSTATE 23505] ERROR: duplicate key value violates unique constraint "idx_user_unique".\nDETAIL: Key (username)=(${data.username}) already exists.`, 'username');
             return;
@@ -242,6 +252,7 @@
         document.getElementById('successPage').style.display = 'block';
     });
 
+    // Awalnya ada tapi boong, jadi ilangin deh.
     function showError(msg, fieldId) {
         // Tampilkan pesan error di console atas
         consoleBox.innerText = msg;
@@ -252,7 +263,7 @@
 
         // Tetap memberikan efek merah pada input yang salah agar user tahu mana yang harus diperbaiki
         const targetInput = document.getElementById(fieldId);
-        targetInput.style.borderColor = '#dc3545';
+        targetInput.style.borderColor = 'var(--border)';
         
         // Reset warna border setelah 3 detik
         setTimeout(() => {
