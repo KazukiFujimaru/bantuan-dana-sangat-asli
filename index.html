@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Registrasi Bantuan Sosial Terpadu 2024</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0056b3;
+            --error-bg: #1a0505;
+            --error-text: #ff6b6b;
+            --border: #ced4da;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 15px;
+        }
+
+        h1 { font-size: 24px; color: var(--primary); margin: 0; }
+        p.desc { font-size: 14px; color: #666; margin-top: 10px; }
+
+        .form-section { margin-bottom: 20px; }
+        .form-section h3 { font-size: 16px; border-left: 4px solid var(--primary); padding-left: 10px; margin-bottom: 15px; }
+
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #444; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 15px;
+            margin-bottom: 5px;
+            box-sizing: border-box; /* Mencegah input melebihi lebar layar di HP */
+            transition: all 0.2s;
+        }
+
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,86,179,0.1); }
+
+        .error-console {
+            display: none;
+            background: var(--error-bg);
+            color: var(--error-text);
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #dc3545;
+            white-space: pre-wrap;
+            word-wrap: break-word; /* Penting untuk mobile agar teks error tidak keluar batas */
+            line-height: 1.4;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover { background: #004494; }
+
+        .success-page {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Mobile Optimization */
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { padding: 20px; }
+            h1 { font-size: 20px; text-align: center; }
+            .error-console { font-size: 11px; padding: 10px; } /* Menyesuaikan ukuran error di HP */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="mainContainer">
+    <header>
+        <h1>PROGRAM BANTUAN SOSIAL TERPADU</h1>
+        <p class="desc">Silahkan lengkapi data pendaftaran untuk verifikasi klaim dana bantuan modal usaha.</p>
+    </header>
+
+    <!-- Tempat Error SQL Muncul -->
+    <div id="errorConsole" class="error-console"></div>
+
+    <form id="registrationForm">
+        <div class="form-section">
+            <h3>Identitas Pribadi</h3>
+            <label>Nama Lengkap (Sesuai KTP)</label>
+            <input type="text" id="fullname" placeholder="">
+            
+            <label>Umur (Tahun)</label>
+            <input type="number" id="age" placeholder="">
+
+            <label>NIK (16 Digit)</label>
+            <input type="number" id="nik" placeholder="">
+        </div>
+
+        <div class="form-section">
+            <h3>Kualifikasi Ekonomi</h3>
+            <label>Penghasilan Per Bulan (Rp)</label>
+            <input type="number" id="income" placeholder="">
+
+            <label>Jumlah Tanggungan Keluarga</label>
+            <input type="number" id="dependents" placeholder="">
+        </div>
+
+        <div class="form-section">
+            <h3>Data Sistem</h3>
+            <label>Area ID (Kode Wilayah)</label>
+            <input type="number" id="area_id" placeholder="">
+
+            <label>Username Akun Bantuan</label>
+            <input type="text" id="username" placeholder="">
+
+            <label>Kode Unik Pendaftaran</label>
+            <input type="text" id="referral" placeholder="">
+        </div>
+
+        <button type="submit">KIRIM PENDAFTARAN</button>
+    </form>
+</div>
+
+<div class="container success-page" id="successPage">
+    <h2 style="color: #28a745;">Pendaftaran Berhasil!</h2>
+    <p>Data Anda telah diterima oleh database pusat. Dana bantuan sebesar <b>Rp 10.000.000</b> dijadwalkan cair dalam 24 jam.</p>
+    <div style="background: #e9ecef; padding: 20px; border-radius: 8px; font-family: monospace; border: 1px dashed #666; margin-top: 20px;">
+        <p style="margin: 0; color: #666; font-size: 12px;">TOKEN VERIFIKASI (FLAG):</p>
+        <p id="flagValue" style="font-size: 18px; font-weight: bold; color: #333; margin: 10px 0;">{{SECRET_FLAG}}</p>
+    </div>
+    <p style="font-size: 12px; color: #999; margin-top: 20px;">*Catatan: Ini adalah simulasi pendaftaran. Dana yang disebutkan adalah fiktif, namun Flag di atas adalah pencapaian asli Anda.</p>
+</div>
+
+<script>
+    const form = document.getElementById('registrationForm');
+    const consoleBox = document.getElementById('errorConsole');
+    const usedUsernames = ['admin', 'budi', 'user123', 'pemerintah'];
+    const validAreaIds = [102, 205, 309];
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        consoleBox.style.display = 'none';
+
+        // Mengambil data
+        const data = {
+            fullname: document.getElementById('fullname').value.trim(),
+            age: parseInt(document.getElementById('age').value),
+            nik: document.getElementById('nik').value,
+            income: parseInt(document.getElementById('income').value),
+            dependents: parseInt(document.getElementById('dependents').value),
+            area_id: parseInt(document.getElementById('area_id').value),
+            username: document.getElementById('username').value.trim().toLowerCase(),
+            referral: document.getElementById('referral').value.trim()
+        };
+
+        // VALIDASI SATU PER SATU (Database Constraint Simulation)
+        
+        // 1. NOT NULL Check
+        for (let key in data) {
+            if (!data[key] && data[key] !== 0) {
+                showError(`[SQLSTATE 23502] ERROR: null value in column "${key}" violates not-null constraint.`, key);
+                return;
+            }
+        }
+
+        // 2. CHECK Umur >= 35
+        if (data.age < 35) {
+            showError(`[SQLSTATE 23514] ERROR: row violates check constraint "chk_user_age".\nDETAIL: (age=${data.age}) must be >= 35.`, 'age');
+            return;
+        }
+
+        // 3. CHECK NIK Length
+        if (data.nik.length !== 16) {
+            showError(`[SQLSTATE 23514] ERROR: value too long for type character(16) or violates "chk_nik_length".`, 'nik');
+            return;
+        }
+
+        // 4. CHECK Income
+        if (data.income > 200000) {
+            showError(`[SQLSTATE 23514] ERROR: violates check constraint "chk_max_income".\nDETAIL: Income Rp ${data.income} exceeds threshold for aid eligibility.`, 'income');
+            return;
+        }
+
+        // 5. CHECK Dependents
+        if (data.dependents <= 4) {
+            showError(`[SQLSTATE 23514] ERROR: violates check constraint "chk_min_dependents".\nDETAIL: At least 4 dependent required.`, 'dependents');
+            return;
+        }
+
+        // 6. FOREIGN KEY Area ID
+        if (!validAreaIds.includes(data.area_id)) {
+            showError(`[SQLSTATE 23503] ERROR: insert violates foreign key constraint "fk_area_ref".\nDETAIL: Key (area_id)=(${data.area_id}) is not present in table "wilayah_indonesia".\nHINT: Try common region codes like 102, 205, or 309.`, 'area_id');
+            return;
+        }
+
+        // 7. UNIQUE Username
+        if (usedUsernames.includes(data.username)) {
+            showError(`[SQLSTATE 23505] ERROR: duplicate key value violates unique constraint "idx_user_unique".\nDETAIL: Key (username)=(${data.username}) already exists.`, 'username');
+            return;
+        }
+
+        // 8. CHECK Referral Format
+        if (!/^BNT-\d{4}$/.test(data.referral)) {
+            showError(`[SQLSTATE 23514] ERROR: value violates check constraint "chk_referral_format".\nDETAIL: Regex pattern matching failed for BNT-XXXX.`, 'referral');
+            return;
+        }
+
+        // JIKA LOLOS SEMUA
+        document.getElementById('mainContainer').style.display = 'none';
+        document.getElementById('successPage').style.display = 'block';
+    });
+
+    function showError(msg, fieldId) {
+        // Tampilkan pesan error di console atas
+        consoleBox.innerText = msg;
+        consoleBox.style.display = 'block';
+        
+        // Scroll ke console error di bagian atas (bukan ke input)
+        consoleBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Tetap memberikan efek merah pada input yang salah agar user tahu mana yang harus diperbaiki
+        const targetInput = document.getElementById(fieldId);
+        targetInput.style.borderColor = '#dc3545';
+        
+        // Reset warna border setelah 3 detik
+        setTimeout(() => {
+            targetInput.style.borderColor = 'var(--border)';
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>
